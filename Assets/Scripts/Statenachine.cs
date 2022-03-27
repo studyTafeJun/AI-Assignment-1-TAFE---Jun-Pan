@@ -2,16 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Statenachine : MonoBehaviour
+public class StateNachine : BaseBuilding
 {
+    //declaring enum
     public enum AiStates
     { 
         Attack,
         Defence,
         Greed,
-        Flee
     }
-    AiStates currentAiStates;
+    //assigning allows enum to be used by outsiders
+    [SerializeField] AiStates currentAiStates;
+
+    [SerializeField] GameObject _miner;
+    [SerializeField] GameObject _troop;
+    [SerializeField] GameObject _turret;
+
+
     void SwitchState()
     {
         switch (currentAiStates) 
@@ -25,9 +32,6 @@ public class Statenachine : MonoBehaviour
             case AiStates.Greed:
                 StartCoroutine(Greed());
                 break;
-            case AiStates.Flee:
-                StartCoroutine(Flee());
-                break;
         }
     }
 
@@ -36,7 +40,7 @@ public class Statenachine : MonoBehaviour
         yield return null;
         while (currentAiStates == AiStates.Attack) 
         { 
-        
+            
         }
         SwitchState();
 
@@ -54,16 +58,7 @@ public class Statenachine : MonoBehaviour
     {
         while (currentAiStates == AiStates.Greed)
         {
-
-        }
-        SwitchState();
-        yield return null;
-    }
-    IEnumerator Flee()
-    {
-        while (currentAiStates == AiStates.Flee)
-        {
-
+            SendTroops(_miner);
         }
         SwitchState();
         yield return null;
