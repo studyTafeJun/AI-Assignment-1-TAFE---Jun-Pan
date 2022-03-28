@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StateNachine : BaseBuilding
 {
@@ -13,12 +14,24 @@ public class StateNachine : BaseBuilding
     }
     //assigning allows enum to be used by outsiders
     [SerializeField] AiStates currentAiStates;
+    //setting the minumin amount of materials to rush
+    [SerializeField] [Range(0,1)] float _materialRushThreshold = 0.8f;
+    //maxinum amount of material to greed
+    [SerializeField] [Range(0, 1)] float _materialGreedThreshold = 0.2f;
+    //maxinum amount of health needed to go defence mode
+    [SerializeField] [Range(0, 1)] float _hPDefenceThreshold = 0.5f;
+    //set timed sends
+    [SerializeField] float _timeToSend = 2f;
 
-    [SerializeField] GameObject _miner;
-    [SerializeField] GameObject _troop;
-    [SerializeField] GameObject _turret;
-
-
+    [SerializeField] Text _stateText;
+    public override void Start()
+    {
+        SwitchState();
+    }
+    void ChangeStateText() 
+    {
+        _stateText.text = "Current State: " + currentAiStates;    
+    }
     void SwitchState()
     {
         switch (currentAiStates) 
@@ -37,30 +50,53 @@ public class StateNachine : BaseBuilding
 
     IEnumerator Attack() 
     {
-        yield return null;
-        while (currentAiStates == AiStates.Attack) 
-        { 
-            
+        Debug.Log("Ai is Attacking");
+        ChangeStateText();
+        while (currentAiStates == AiStates.Attack)
+        {
+            SendTroops(troop, 50, 200);
+            if (materialAmount < maxMaterialAmount * _materialGreedThreshold)
+            {
+                currentAiStates = AiStates.Greed;
+            }
+            if (hP < _maxHP * _hPDefenceThreshold) 
+            {
+                currentAiStates = AiStates.Defence;
+            }
+            yield return new WaitForSeconds(_timeToSend);
+
+            yield return null;
         }
         SwitchState();
 
     }
     IEnumerator Defence()
     {
+        Debug.Log("Ai is Defending");
+        ChangeStateText();
         while (currentAiStates == AiStates.Defence)
         {
-
+            if (hP > _maxHP * _hPDefenceThreshold)
+            {
+                currentAiStates = AiStates.Attack;
+            }
+            yield return null;
         }
         SwitchState();
-        yield return null;
     }
     IEnumerator Greed()
     {
+        Debug.Log("Ai is Greeding");
+        ChangeStateText();
         while (currentAiStates == AiStates.Greed)
         {
-            SendTroops(_miner);
+            SendTroops(miner, 0, 50);
+            if (materialAmount > maxMaterialAmount * _materialRushThreshold) 
+            {
+                currentAiStates = AiStates.Attack;
+            }
+            yield return new WaitForSeconds(_timeToSend);
         }
         SwitchState();
-        yield return null;
     }
 }
