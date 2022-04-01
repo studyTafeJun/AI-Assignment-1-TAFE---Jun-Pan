@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StateNachine : BaseBuilding
+public class StateMachine : BaseBuilding
 {
     //declaring enum
     public enum AiStates
@@ -88,14 +88,18 @@ public class StateNachine : BaseBuilding
     {
         Debug.Log("Ai is Greeding");
         ChangeStateText();
-        while (currentAiStates == AiStates.Greed)
+        while (currentAiStates == AiStates.Greed && materialAmount < maxMaterialAmount * _materialRushThreshold && hP > _maxHP * _hPDefenceThreshold)
         {
             SendTroops(miner, 0, 50);
-            if (materialAmount > maxMaterialAmount * _materialRushThreshold) 
-            {
-                currentAiStates = AiStates.Attack;
-            }
             yield return new WaitForSeconds(_timeToSend);
+        }
+        if (hP < _maxHP * _hPDefenceThreshold)
+        {
+            currentAiStates = AiStates.Defence;
+        }
+        else
+        {
+            currentAiStates = AiStates.Attack;
         }
         SwitchState();
     }

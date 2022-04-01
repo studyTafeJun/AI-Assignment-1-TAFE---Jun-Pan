@@ -18,13 +18,13 @@ public class WarriorAI : BaseAI
 
     private void Start()
     {
-        if (ownerBuilding.GetComponent<StateNachine>()) 
+        if (ownerBuilding.GetComponent<StateMachine>()) 
         {
             Player _buildingScripted = FindObjectOfType<Player>();
             _oppositeBase = _buildingScripted.GetComponent<Transform>();
         } else if (ownerBuilding.GetComponent<Player>()) 
         {
-            StateNachine _buildingScripted = FindObjectOfType<StateNachine>();
+            StateMachine _buildingScripted = FindObjectOfType<StateMachine>();
             _oppositeBase = _buildingScripted.GetComponent<Transform>();
         }
         SwitchStates();
@@ -87,7 +87,7 @@ public class WarriorAI : BaseAI
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.LogWarning(collision);
-        if (collision.GetComponent<BaseAI>().ownerBuilding != ownerBuilding) 
+        if (collision.GetComponent<BaseAI>().ownerBuilding != ownerBuilding && _currentWarriorState != WarriorStates.DamageBase && Vector2.Distance(transform.position, _oppositeBase.position) > 8) 
         {
             _currentWarriorState = WarriorStates.AttackTroops;
             currentTarget = collision.transform;

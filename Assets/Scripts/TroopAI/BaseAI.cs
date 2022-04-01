@@ -23,7 +23,10 @@ public class BaseAI : MonoBehaviour
     public void moveTowards()
     {
         //if (Vector2.Distance(transform.position, currentTarget.position) > stoppingDistance) {
-        transform.position = Vector3.MoveTowards(transform.position, currentTarget.position, _speed * Time.deltaTime);
+        if (currentTarget != null)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, currentTarget.position, _speed * Time.deltaTime);
+        }
         //}
     }
     public Transform seekClosest(List<Transform> objectList) 
